@@ -6,14 +6,14 @@ from tellopy import Tello
 import tf2_ros
 import time
 import cv2
+from tello_driver import TelloDriver
+
 
 # - ROS messages imports
 from geometry_msgs.msg import Twist
 
-# from geometry_msgs.msg import TwistStamped
+from geometry_msgs.msg import TwistStamped
 from sensor_msgs.msg import Image
-
-# from tello_ros_wrapper.msg import FlightData
 
 
 class TelloDriverRos:
@@ -54,17 +54,14 @@ class TelloDriverRos:
     pub_step_time_interval = 0.02
 
     def __init__(self):
-        self.tello = Tello()
+        self.driver = TelloDriver("tello03")
 
     def begin(self):
         rospy.init_node("Tello_driver_ros")
         self.init_pub()
         self.init_sub()
         self.init_timers()
-        # self.tello.connect()
-        # self.tello.wait_for_connection()
-        # time.sleep(2)
-        # self.tello.takeoff()
+        self.driver.begin()
 
     def init_pub(self):
         # self.tello_flight_data_pub = rospy.Publisher(
@@ -105,10 +102,8 @@ class TelloDriverRos:
         alg_vel_cmd[0] = twist_msg.angular.x
         alg_vel_cmd[1] = twist_msg.angular.y
         alg_vel_cmd[2] = twist_msg.angular.z
-        print(f"lin: {lin_vel_cmd}")
-        print(f"ag: {alg_vel_cmd}")
 
-        self.set_tello_vel_cmd(lin_vel_cmd, alg_vel_cmd)
+        self.driver.set_cmd_vel(lin_vel_cmd, alg_vel_cmd)
 
     def tello_vel_cmd_stamped_callback(self, twist_msg):
         lin_vel_cmd = np.zeros((3,), dtype=float)

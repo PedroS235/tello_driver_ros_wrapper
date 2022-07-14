@@ -4,6 +4,7 @@ import threading
 
 from pynput import keyboard
 from geometry_msgs.msg import Twist
+from std_msgs.msg import Empty
 
 
 class TelloController:
@@ -16,14 +17,20 @@ class TelloController:
             "takeoff": 0,
             "land": 0,
         }
-        self.speed = 0.5
-        keyboard_thread = threading.Thread(target=self.keyboard_listener)
-        keyboard_thread.start()
+        self.speed = 0.5  # from 0 - 1
+        self._keyboard_listener = keyboard.Listener(
+            on_press=self.on_press, on_release=self.on_release
+        )
 
     def begin(self):
         rospy.init_node("Controller", anonymous=True)
         self.cmd_vel_pub = rospy.Publisher("/tello_cmd_vel", Twist, queue_size=10)
         self.rate = rospy.Rate(10)
+
+        # ROS publishers
+        self._takeoff_pub = rospy.Publisher("takeoff", Empty, queue_size=1)
+        self._land_pub = rospy.Publisher("takeoff", Empty, queue_size=1)
+        self._keyboard_listener.start()
 
     def on_press(self, key):
         try:
@@ -36,9 +43,9 @@ class TelloController:
             if key.char == "a":
                 self.key_pressed["right"] = -self.speed
             if key.char == "t":
-                self.key_pressed["t"] = self.speed
+                self._takeoff_pub.publish(Empty())
             if key.char == "l":
-                self.key_pressed["l"] = self.speed
+                self._land_pub.publish(Empty())
         except AttributeError:
             pass
 
@@ -48,9 +55,9 @@ class TelloController:
             if key == key.down:
                 self.key_pressed["th"] = -self.speed
             if key == key.left:
-                self.key_pressed["cw"] = self.speed
-            if key == key.right:
                 self.key_pressed["cw"] = -self.speed
+            if key == key.right:
+                self.key_pressed["cw"] = self.speed
         except AttributeError:
             pass
 
@@ -66,10 +73,6 @@ class TelloController:
                 self.key_pressed["right"] = 0
             if key.char == "a":
                 self.key_pressed["right"] = 0
-            if key.char == "t":
-                self.key_pressed["t"] = 0
-            if key.char == "l":
-                self.key_pressed["l"] = 0
         except AttributeError:
             pass
 
@@ -84,15 +87,6 @@ class TelloController:
                 self.key_pressed["cw"] = 0
         except AttributeError:
             pass
-
-    def keyboard_listener(self):
-        with keyboard.Listener(
-            on_press=self.on_press, on_release=self.on_release
-        ) as listener:
-            listener.join()
-
-        listener = keyboard.Listener(on_press=self.on_press, on_release=self.on_release)
-        listener.start()
 
     def run(self):
         while not rospy.is_shutdown():
@@ -111,7 +105,4 @@ if __name__ == "__main__":
     tello = TelloController()
     tello.begin()
 
-    try:
-        tello.run()
-    except rospy.ROSInterruptException:
-        self.keyboard_thread.join()
+    tello.run()
