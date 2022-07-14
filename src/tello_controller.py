@@ -39,16 +39,27 @@ class TelloController:
                 self.key_pressed["t"] = self.speed
             if key.char == 'l':
                 self.key_pressed["l"] = self.speed
+        except AttributeError:
+            pass
 
+
+        try:
             if key == key.up:
                 self.key_pressed["th"] = self.speed
             if key == key.down:
-                self.key_pressed["th"] = -self.speed
+                self.key_pressed["th"] = self.speed
             if key == key.left:
-                self.key_pressed["cw"] = -self.speed
+                self.key_pressed["cw"] = self.speed
             if key == key.right:
                 self.key_pressed["cw"] = self.speed
-
+            if key == key.up:
+                self.key_pressed["th"] = self.speed
+            if key == key.down:
+                self.key_pressed["th"] = self.speed
+            if key == key.left:
+                self.key_pressed["cw"] = self.speed
+            if key == key.right:
+                self.key_pressed["cw"] = self.speed
         except AttributeError:
             pass
 
@@ -68,7 +79,18 @@ class TelloController:
                 self.key_pressed["t"] = 0
             if key.char == 'l':
                 self.key_pressed["l"] = 0
+        except AttributeError:
+            pass
 
+        try:
+            if key == key.up:
+                self.key_pressed["th"] = 0
+            if key == key.down:
+                self.key_pressed["th"] = 0
+            if key == key.left:
+                self.key_pressed["cw"] = 0
+            if key == key.right:
+                self.key_pressed["cw"] = 0
             if key == key.up:
                 self.key_pressed["th"] = 0
             if key == key.down:
