@@ -9,9 +9,11 @@ import cv2
 
 # - ROS messages imports
 from geometry_msgs.msg import Twist
-from geometry_msgs.msg import TwistStamped
+
+# from geometry_msgs.msg import TwistStamped
 from sensor_msgs.msg import Image
-from tello_ros_wrapper.msg import FlightData
+
+# from tello_ros_wrapper.msg import FlightData
 
 
 class TelloDriverRos:
@@ -34,19 +36,18 @@ class TelloDriverRos:
     tello_vel_cmd_stamped_sub = None
 
     # - Topics
-    cmd_vel_topic_name = '/tello_cmd_vel'
-    video_stream_topic_name = '/camera/image_raw'
-    tello_flight_data_topic_name = '/tello_flight_data'
-    tello_vel_cmd_unstamped_topic_name = '/tello_cmd'
-    tello_vel_cmd_stamped_topic_name = '/tello_cmd_stamped'
+    video_stream_topic_name = "/camera/image_raw"
+    tello_flight_data_topic_name = "/tello_flight_data"
+    tello_vel_cmd_unstamped_topic_name = "/tello_cmd_vel"
+    tello_vel_cmd_stamped_topic_name = "/tello_cmd_stamped"
 
     # - TF2
-    tello_frame = 'tello_base_link'
-    world_frame = 'world'
+    tello_frame = "tello_base_link"
+    world_frame = "world"
     tf2_broadcaster = None
 
     # - Flags
-    flag_sub_tello_vel_cmd_unstamped = False
+    flag_sub_tello_vel_cmd_unstamped = True
 
     # - Timers
     pub_step_timer = None
@@ -56,25 +57,34 @@ class TelloDriverRos:
         self.tello = Tello()
 
     def begin(self):
-        rospy.init_node('Tello_driver_ros')
+        rospy.init_node("Tello_driver_ros")
         self.init_pub()
         self.init_sub()
         self.init_timers()
+        # self.tello.connect()
+        # self.tello.wait_for_connection()
+        # time.sleep(2)
+        # self.tello.takeoff()
 
     def init_pub(self):
-        self.tello_flight_data_pub = rospy.Publisher(
-            self.tello_flight_data_topic_name, FlightData
-        )
+        # self.tello_flight_data_pub = rospy.Publisher(
+        #     self.tello_flight_data_topic_name, FlightData
+        # )
+        pass
 
     def init_sub(self):
         if self.flag_sub_tello_vel_cmd_unstamped:
             self.tello_vel_cmd_unstamped_sub = rospy.Subscriber(
-                self.tello_vel_cmd_unstamped_topic_name, Twist
+                self.tello_vel_cmd_unstamped_topic_name,
+                Twist,
+                self.tello_vel_cmd_unstamped_callback,
             )
 
-        self.tello_vel_cmd_stamped_sub = rospy.Subscriber(
-            self.tello_vel_cmd_stamped_topic_name, Twist
-        )
+        # self.tello_vel_cmd_stamped_sub = rospy.Subscriber(
+        #     self.tello_vel_cmd_stamped_topic_name,
+        #     Twist,
+        #     self.tello_vel_cmd_stamped_callback,
+        # )
 
     def init_timers(self):
         self.pub_step_timer = rospy.Timer(
@@ -87,14 +97,18 @@ class TelloDriverRos:
 
     def tello_vel_cmd_unstamped_callback(self, twist_msg):
         lin_vel_cmd = np.zeros((3,), dtype=float)
-        lin_vel_cmd[0] = twist_msg.twist.linear.x
-        lin_vel_cmd[1] = twist_msg.twist.linear.y
-        lin_vel_cmd[2] = twist_msg.twist.linear.z
+        lin_vel_cmd[0] = twist_msg.linear.x
+        lin_vel_cmd[1] = twist_msg.linear.y
+        lin_vel_cmd[2] = twist_msg.linear.z
 
         alg_vel_cmd = np.zeros((3,), dtype=float)
-        alg_vel_cmd[0] = twist_msg.twist.linear.x
-        alg_vel_cmd[1] = twist_msg.twist.linear.y
-        alg_vel_cmd[2] = twist_msg.twist.linear.z
+        alg_vel_cmd[0] = twist_msg.angular.x
+        alg_vel_cmd[1] = twist_msg.angular.y
+        alg_vel_cmd[2] = twist_msg.angular.z
+        print(f"lin: {lin_vel_cmd}")
+        print(f"ag: {alg_vel_cmd}")
+
+        self.set_tello_vel_cmd(lin_vel_cmd, alg_vel_cmd)
 
     def tello_vel_cmd_stamped_callback(self, twist_msg):
         lin_vel_cmd = np.zeros((3,), dtype=float)
@@ -103,29 +117,26 @@ class TelloDriverRos:
         lin_vel_cmd[2] = twist_msg.twist.linear.z
 
         alg_vel_cmd = np.zeros((3,), dtype=float)
-        alg_vel_cmd[0] = twist_msg.twist.linear.x
-        alg_vel_cmd[1] = twist_msg.twist.linear.y
-        alg_vel_cmd[2] = twist_msg.twist.linear.z
+        alg_vel_cmd[0] = twist_msg.twist.angular.x
+        alg_vel_cmd[1] = twist_msg.twist.angular.y
+        alg_vel_cmd[2] = twist_msg.twist.angular.z
 
     def pub_step_timer_callback(self, timer_msg):
         pass
 
-    def drone_controller(self, lin_vel_cmd, ang_vel_cmd):
+    def set_tello_vel_cmd(self, lin_vel_cmd, ang_vel_cmd):
         self.tello.forward(lin_vel_cmd[0] * 100)
-        self.tello.up(lin_vel_cmd[1] * 100)
-        self.tello.right(lin_vel_cmd[0] * 100)
+        self.tello.right(lin_vel_cmd[1] * 100)
+        self.tello.up(lin_vel_cmd[2] * 100)
 
-        self.tello.clockwise(alg_vel_cmd[2] * 100)
+        self.tello.clockwise(ang_vel_cmd[2] * 100)
 
     def run(self):
         rospy.spin()
-        return
-
-    def set_tello_vel_cmd(self):
-        pass
+        self.tello.quit()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     tello_driver = TelloDriverRos()
     tello_driver.begin()
     tello_driver.run()
