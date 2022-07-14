@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package format="2">
+
+  <name>tello_ros_suite</name>
+  <version>1.0.0</version>
+  <description>ROS suite for drone autonomous operations</description>
+
+  <maintainer email="pmbs.12@hotmail.com">Pedro Soares</maintainer>
+  <maintainer email="alessandro.giffra.001@uni.lu">Alessandro Giffra</maintainer>
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <!--all the packages of the suite -->
+  <exec_depend>tello_ros_driver</exec_depend>
+  <exec_depend>tello_ros_controller</exec_depend>
+  <exec_depend>tello_ros_pid</exec_depend>
+  <exec_depend>tello_ros_msgs</exec_depend>
+  
+  <export>
+    <metapackage/>
+  </export>
+</package>

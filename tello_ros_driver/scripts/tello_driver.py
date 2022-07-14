@@ -11,7 +11,7 @@ import numpy as np
 
 from tellopy import Tello
 from cv_bridge import CvBridge
-from tello_ros_wrapper.msg import FlightData
+from tello_ros_msgs.msg import FlightData
 from utils import connect_wifi_device as cwd
 
 

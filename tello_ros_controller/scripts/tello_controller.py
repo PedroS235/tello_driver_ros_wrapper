@@ -14,8 +14,6 @@ class TelloController:
             "right": 0,
             "forward": 0,
             "cw": 0,
-            "takeoff": 0,
-            "land": 0,
         }
         self.speed = 0.5  # from 0 - 1
         self._keyboard_listener = keyboard.Listener(
@@ -29,7 +27,7 @@ class TelloController:
 
         # ROS publishers
         self._takeoff_pub = rospy.Publisher("takeoff", Empty, queue_size=1)
-        self._land_pub = rospy.Publisher("takeoff", Empty, queue_size=1)
+        self._land_pub = rospy.Publisher("land", Empty, queue_size=1)
         self._keyboard_listener.start()
 
     def on_press(self, key):
