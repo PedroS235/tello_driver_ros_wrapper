@@ -1,0 +1,10 @@
+av==9.2.0
+catkin_pkg==0.5.2
+catkin_pkg_modules==0.5.2
+cv_bridge==1.16.0
+numpy==1.17.4
+pynput==1.7.6
+rospy==1.15.14
+sensor_msgs==1.13.1
+tellopy==0.6.0
+tf2_ros==0.7.5
