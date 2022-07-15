@@ -5,4 +5,4 @@ setup_args = generate_distutils_setup(
     packages=["tello_ros_driver"], package_dir={"": "scripts"}
 )
 
-setup(**setup_args)r
+setup(**setup_args)
