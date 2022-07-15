@@ -36,10 +36,8 @@ class TelloDriverRos:
     tello_vel_cmd_stamped_sub = None
 
     # - Topics
-    video_stream_topic_name = "/camera/image_raw"
-    tello_flight_data_topic_name = "/tello_flight_data"
-    tello_vel_cmd_unstamped_topic_name = "/tello_cmd_vel"
-    tello_vel_cmd_stamped_topic_name = "/tello_cmd_stamped"
+    tello_vel_cmd_unstamped_topic_name = "/tello/cmd_vel_unstamped"
+    tello_vel_cmd_stamped_topic_name = "/tello/cmd_vel_stamped"
 
     # - TF2
     tello_frame = "tello_base_link"
