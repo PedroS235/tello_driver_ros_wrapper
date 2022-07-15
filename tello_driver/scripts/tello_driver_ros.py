@@ -52,7 +52,7 @@ class TelloDriverRos:
     pub_step_time_interval = 0.02
 
     def __init__(self):
-        self.driver = TelloDriver("tello03")
+        self.driver = TelloDriver()
 
     def begin(self):
         rospy.init_node("Tello_driver_ros")
@@ -86,6 +86,28 @@ class TelloDriverRos:
             rospy.Duration(self.pub_step_time_interval), self.pub_step_timer_callback
         )
 
+    def read_params(self):
+        self.tello_vel_cmd_unstamped_topic_name = rospy.get_param(
+            "/tello_driver_node/tello_vel_cmd_unstamped_topic_name",
+            default=self.tello_vel_cmd_unstamped_topic_name,
+        )
+        self.tello_vel_cmd_stamped_topic_name = rospy.get_param(
+            "/tello_driver_node/tello_vel_cmd_stamped_topic_name",
+            default=self.tello_vel_cmd_stamped_topic_name,
+        )
+
+        self.flag_sub_tello_vel_cmd_unstamped = rospy.get_param(
+            "/tello_driver_node/flag_sub_tello_vel_cmd_unstamped",
+            default=self.flag_sub_tello_vel_cmd_unstamped,
+        )
+
+        self.tello_frame = rospy.get_param(
+            "/tello_driver_node/tello_frame_name", self.tello_frame
+        )
+        self.world_frame = rospy.get_param(
+            "/tello_driver_node/tello_world_frame_name", self.world_frame
+        )
+
     # +-----------+
     # | Callbacks |
     # +-----------+
@@ -113,6 +135,8 @@ class TelloDriverRos:
         alg_vel_cmd[0] = twist_msg.twist.angular.x
         alg_vel_cmd[1] = twist_msg.twist.angular.y
         alg_vel_cmd[2] = twist_msg.twist.angular.z
+
+        self.driver.set_cmd_vel(lin_vel_cmd, alg_vel_cmd)
 
     def pub_step_timer_callback(self, timer_msg):
         pass

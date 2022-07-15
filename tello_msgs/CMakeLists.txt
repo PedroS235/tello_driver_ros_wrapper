@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(tello_ros_msgs)
+project(tello_msgs)
 
 find_package(catkin REQUIRED COMPONENTS
   message_generation

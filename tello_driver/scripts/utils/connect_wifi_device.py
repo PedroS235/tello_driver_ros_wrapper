@@ -19,7 +19,6 @@ def connect_device(ssid, password=None, verbose=True):
 
     Returns True if the connection was establish, False otherwise.
     """
-    # global connection_attempts
 
     print(f"[INFO] - Establishing WiFi connection to {ssid} ...") if verbose else None
 
@@ -35,6 +34,7 @@ def connect_device(ssid, password=None, verbose=True):
             f"[ERROR] - Unable to establish connection with {ssid}"
         ) if verbose else None
 
+        global CONNECTION_ATTEMPTS
         CONNECTION_ATTEMPTS += 1
         if CONNECTION_ATTEMPTS > MAX_NUMBER_OF_ATTEMPTS:
             return False
@@ -48,15 +48,15 @@ def connect_device(ssid, password=None, verbose=True):
     return True
 
 
-# def main():
-#     ap = argparse.ArgumentParser()
-#     ap.add_argument("-id", "--ssid", required=True, help="Enter the WiFi SSID")
-#     ap.add_argument("-pw", "--password", default=None, help="Enter the WiFi password")
-#
-#     args = vars(ap.parse_args())
-#
-#     connect_device(args["ssid"], args["password"])
-#
-#
-# if __name__ == "__main__":
-#     main()
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("-id", "--ssid", required=True, help="Enter the WiFi SSID")
+    ap.add_argument("-pw", "--password", default=None, help="Enter the WiFi password")
+
+    args = vars(ap.parse_args())
+
+    connect_device(args["ssid"], args["password"])
+
+
+if __name__ == "__main__":
+    main()

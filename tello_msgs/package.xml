@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>tello_ros_msgs</name>
+  <name>tello_msgs</name>
   <version>0.0.0</version>
   <description>The tello_ros_wrapper package</description>
 

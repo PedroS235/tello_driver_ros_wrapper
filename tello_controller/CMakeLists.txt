@@ -1,13 +1,15 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(tello_ros_driver)
+project(tello_controller)
 
 find_package(catkin REQUIRED COMPONENTS
-  geometry_msgs
   rospy
-  std_msgs
-  sensor_msgs
   message_generation
+
+  # - Messages
+  std_msgs
+  geometry_msgs
 )
+
 
 catkin_package(
     DEPENDS

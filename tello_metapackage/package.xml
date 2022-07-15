@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <package format="2">
 
-  <name>tello_ros_suite</name>
+  <name>tello_ros_wrapper</name>
   <version>1.0.0</version>
-  <description>ROS suite for drone autonomous operations</description>
+  <description>ROS metapackage for drone autonomous operations</description>
 
   <maintainer email="pmbs.12@hotmail.com">Pedro Soares</maintainer>
   <maintainer email="alessandro.giffra.001@uni.lu">Alessandro Giffra</maintainer>
@@ -12,10 +12,11 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <!--all the packages of the suite -->
-  <exec_depend>tello_ros_driver</exec_depend>
-  <exec_depend>tello_ros_controller</exec_depend>
-  <exec_depend>tello_ros_pid</exec_depend>
-  <exec_depend>tello_ros_msgs</exec_depend>
+  <exec_depend>tello_driver</exec_depend>
+  <exec_depend>tello_controller</exec_depend>
+  <exec_depend>tello_pid</exec_depend>
+  <exec_depend>tello_msgs</exec_depend>
+  <exec_depend>tello_launch</exec_depend>
   
   <export>
     <metapackage/>

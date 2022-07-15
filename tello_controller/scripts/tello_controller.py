@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import rospy
-import threading
 
 from pynput import keyboard
 from geometry_msgs.msg import Twist
@@ -8,7 +7,13 @@ from std_msgs.msg import Empty
 
 
 class TelloController:
-    def __init__(self, topic_name="/tello_cmd_vel"):
+
+    # - Topics
+    tello_vel_cmd_unstamped_topic_name = "/tello/cmd_vel_unstamped"
+    tello_takeoff_topic_name = "/tello/takeoff"
+    tello_land_topic_name = "/tello/land"
+
+    def __init__(self):
         self.key_pressed = {
             "th": 0,
             "right": 0,
@@ -21,14 +26,41 @@ class TelloController:
         )
 
     def begin(self):
-        rospy.init_node("Controller", anonymous=True)
-        self.cmd_vel_pub = rospy.Publisher("/tello_cmd_vel", Twist, queue_size=10)
-        self.rate = rospy.Rate(10)
+        rospy.init_node("Tello Controller", anonymous=True)
+        self.read_params()
 
-        # ROS publishers
-        self._takeoff_pub = rospy.Publisher("takeoff", Empty, queue_size=1)
-        self._land_pub = rospy.Publisher("land", Empty, queue_size=1)
+        self.init_pub()
+
+        self.rate = rospy.Rate(0.2)
+
         self._keyboard_listener.start()
+
+    def init_pub(self):
+        self.cmd_vel_pub = rospy.Publisher(
+            self.tello_vel_cmd_unstamped_topic_name, Twist, queue_size=10
+        )
+
+        self._takeoff_pub = rospy.Publisher(
+            self.tello_takeoff_topic_name, Empty, queue_size=1
+        )
+
+        self._land_pub = rospy.Publisher(
+            self.tello_land_topic_name, Empty, queue_size=1
+        )
+
+    def read_params(self):
+        self.tello_takeoff_topic_name = rospy.get_param(
+            "/tello_driver_node/tello_takeoff_topic_name",
+            default=self.tello_takeoff_topic_name,
+        )
+        self.tello_land_topic_name = rospy.get_param(
+            "/tello_driver_node/tello_land_topic_name",
+            default=self.tello_land_topic_name,
+        )
+        self.tello_vel_cmd_unstamped_topic_name = rospy.get_param(
+            "/tello_driver_node/tello_vel_cmd_unstamped_topic_name",
+            default=self.tello_vel_cmd_unstamped_topic_name,
+        )
 
     def on_press(self, key):
         try:
