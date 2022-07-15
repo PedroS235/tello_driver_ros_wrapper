@@ -30,6 +30,6 @@ In order to inform the drone to land or takeoff, there are 2 additional topics w
 In order to be able to use tello_ros_wrapper metapackage, some dependencies are needed.
 
 1. python3: `sudo apt install python3`
-2. python3 pip: 'sudo apt install python3-pip'
+2. python3 pip: `sudo apt install python3-pip`
 3. ROS noetic: [Installation guide](http://wiki.ros.org/noetic/Installation/Ubuntu)
 4. python libraries: `pip install requirements.txt`
