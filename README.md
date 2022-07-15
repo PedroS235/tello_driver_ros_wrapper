@@ -1,7 +1,7 @@
 # Introduction
 
 Tello_ros_wrapper is a ros metapackage that containst multiple ros packages to control DJI Tello drone.
-In it's core lies the package **tello_ros_driver* which is responsible to send the commands to the drone.
+In it's core lies the package **tello_ros_driver** which is responsible to send the commands to the drone.
 In addition, a package **tello_ros_controller** is provided to be able to communicate with the drone via keyboard.
 As for the rest of the packages, the purpose of them are to make the tello autonomous by integrating obstacle avoidance for instance.
 
