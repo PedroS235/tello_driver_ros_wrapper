@@ -41,6 +41,7 @@ class TelloDriver(object):
 
     # - Booleans
     _connect_to_tello_wifi_auto = True
+    flag_collision_detected = False
 
     def __init__(self):
 
@@ -110,13 +111,25 @@ class TelloDriver(object):
         )
 
     def set_cmd_vel(self, lin_cmd_vel, ang_cmd_vel):
-        # - Linear cmd_vel
-        self._tello.set_pitch(lin_cmd_vel[0] * 2)  # linear X value
-        self._tello.set_roll(lin_cmd_vel[1] * 2)  # linear Y value
-        self._tello.set_throttle(lin_cmd_vel[2] * 2)  # linear Z value
+        if self.flag_collision_detected:
+            # - Linear cmd_vel
+            self._tello.set_pitch(0)  # linear X value
+            self._tello.set_roll(0)  # linear Y value
+            self._tello.set_throttle(0)  # linear Z value
 
-        # - Angular cmd_vel
-        self._tello.set_yaw(ang_cmd_vel[2] * 2)  # angualr Z value
+            # - Angular cmd_vel
+            self._tello.set_yaw(0)  # angualr Z value
+        else:
+            # - Linear cmd_vel
+            self._tello.set_pitch(lin_cmd_vel[0] * 2)  # linear X value
+            self._tello.set_roll(lin_cmd_vel[1] * 2)  # linear Y value
+            self._tello.set_throttle(lin_cmd_vel[2] * 2)  # linear Z value
+
+            # - Angular cmd_vel
+            self._tello.set_yaw(ang_cmd_vel[2] * 2)  # angualr Z value
+    
+    def set_flag_collision_detected(self, flag):
+        self.flag_collision_detected = flag
 
     # +--------------------+
     # | Start of Callbacks |

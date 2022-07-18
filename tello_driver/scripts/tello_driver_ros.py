@@ -7,9 +7,9 @@ from tello_driver import TelloDriver
 
 
 # - ROS messages imports
-from geometry_msgs.msg import Twist
+from geometry_msgs.msg import Twist, TwistStamped, PoseStamped, Header
+from std_msgs.msg import Bool
 
-from geometry_msgs.msg import TwistStamped
 
 class TelloDriverRos:
 
@@ -27,10 +27,13 @@ class TelloDriverRos:
     flag_sub_tello_vel_cmd_unstamped = True
     tello_vel_cmd_unstamped_sub = None
     tello_vel_cmd_stamped_sub = None
+    robot_collision_sub = None
 
     # - Topics
     tello_vel_cmd_unstamped_topic_name = "/tello/cmd_vel_unstamped"
     tello_vel_cmd_stamped_topic_name = "/tello/cmd_vel_stamped"
+    tello_collision_topic_name = "/tello/is_colliding"
+    tello_pose_topic_name = "/tello/pose"
 
     # - TF2
     tello_frame = "tello_base_link"
@@ -55,10 +58,9 @@ class TelloDriverRos:
         self.driver.begin()
 
     def init_pub(self):
-        # self.tello_flight_data_pub = rospy.Publisher(
-        #     self.tello_flight_data_topic_name, FlightData
-        # )
-        pass
+        self.tello_pose_pub = rospy.Publisher(
+            self.tello_pose_topic_name, PoseStamped, queue_size=1
+        )
 
     def init_sub(self):
         if self.flag_sub_tello_vel_cmd_unstamped:
@@ -72,6 +74,10 @@ class TelloDriverRos:
             self.tello_vel_cmd_stamped_topic_name,
             TwistStamped,
             self.tello_vel_cmd_stamped_callback,
+        )
+
+        self.robot_collision_sub = rospy.Subscriber(
+            self.tello_collision_topic_name, Bool, self.tello_collision_callback
         )
 
     def init_timers(self):
@@ -101,9 +107,9 @@ class TelloDriverRos:
             "/tello_driver_node/tello_world_frame_name", self.world_frame
         )
 
-    # +-----------+
-    # | Callbacks |
-    # +-----------+
+    # +--------------------+
+    # | Start of Callbacks |
+    # +--------------------+
 
     def tello_vel_cmd_unstamped_callback(self, twist_msg):
         lin_vel_cmd = np.zeros((3,), dtype=float)
@@ -132,14 +138,41 @@ class TelloDriverRos:
         self.driver.set_cmd_vel(lin_vel_cmd, alg_vel_cmd)
 
     def pub_step_timer_callback(self, timer_msg):
-        pass
+        self.tello_pose_msg_creation()
 
-    def set_tello_vel_cmd(self, lin_vel_cmd, ang_vel_cmd):
-        self.tello.forward(lin_vel_cmd[0] * 100)
-        self.tello.right(lin_vel_cmd[1] * 100)
-        self.tello.up(lin_vel_cmd[2] * 100)
+    def tello_collision_callback(self, msg):
+        self.driver.set_flag_collision_detected(msg.data)
 
-        self.tello.clockwise(ang_vel_cmd[2] * 100)
+    # +------------------+
+    # | End of Callbacks |
+    # +------------------+
+
+    def tello_pose_msg_creation(self):
+        curr_time_stamp = rospy.Time()
+        try:
+            pose = self.buffer.lookup_transform(
+                self.world_frame, self.robot_frame, curr_time_stamp
+            )
+
+            #
+            robot_pose_msg = PoseStamped()
+
+            robot_pose_msg.header = Header()
+            robot_pose_msg.header.stamp = curr_time_stamp
+            robot_pose_msg.header.frame_id = self.world_frame
+
+            robot_pose_msg.pose.position.x = pose.transform.translation.x
+            robot_pose_msg.pose.position.y = pose.transform.translation.y
+            robot_pose_msg.pose.position.z = pose.transform.translation.z
+
+            robot_pose_msg.pose.orientation.w = pose.transform.rotation.w
+            robot_pose_msg.pose.orientation.x = pose.transform.rotation.x
+            robot_pose_msg.pose.orientation.y = pose.transform.rotation.y
+            robot_pose_msg.pose.orientation.z = pose.transform.rotation.z
+
+            self.tello_pose_pub.publish(robot_pose_msg)
+        except:
+            pass
 
     def run(self):
         rospy.spin()
