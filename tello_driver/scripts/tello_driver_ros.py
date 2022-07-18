@@ -106,6 +106,10 @@ class TelloDriverRos:
         self.world_frame = rospy.get_param(
             "/tello_driver_node/tello_world_frame_name", self.world_frame
         )
+        self.tello_collision_topic_name = rospy.get_param(
+            "/tello_driver_node/tello_collision_topic_name",
+            self.tello_collision_topic_name,
+        )
 
     # +--------------------+
     # | Start of Callbacks |

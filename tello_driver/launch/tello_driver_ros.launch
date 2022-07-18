@@ -12,6 +12,7 @@
   <arg name="tello_flight_data_topic_name" default="/tello/flight_data" />
   <arg name="tello_vel_cmd_unstamped_topic_name" default="/tello/cmd_vel_unstamped" />
   <arg name="tello_vel_cmd_stamped_topic_name" default="/tello/cmd_vel_stamped" />
+  <arg name="tello_collision_topic_name" default="/tello/is_colliding" />
 
   <!-- Tello WiFi credentials-->
   <arg name="tello_ssid" default="tello" />
@@ -30,6 +31,7 @@
     <param name="tello_flight_data_topic_name" value="$(arg tello_flight_data_topic_name)" type="string" />
     <param name="tello_vel_cmd_unstamped_topic_name" value="$(arg tello_vel_cmd_unstamped_topic_name)" type="string" />
     <param name="tello_vel_cmd_stamped_topic_name" value="$(arg tello_vel_cmd_stamped_topic_name)" type="string" />
+    <param name="tello_collision_topic_name" value="$(arg tello_collision_topic_name)" type="boolean" />
 
     <param name="tello_frame_name" value="$(arg tello_frame_name)" type="string" />
     <param name="tello_world_frame_name" value="$(arg tello_world_frame_name)" type="string" />
