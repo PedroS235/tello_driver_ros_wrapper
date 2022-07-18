@@ -2,10 +2,7 @@
 
 import rospy
 import numpy as np
-from tellopy import Tello
 import tf2_ros
-import time
-import cv2
 from tello_driver import TelloDriver
 
 
@@ -13,15 +10,11 @@ from tello_driver import TelloDriver
 from geometry_msgs.msg import Twist
 
 from geometry_msgs.msg import TwistStamped
-from sensor_msgs.msg import Image
-
 
 class TelloDriverRos:
 
     # - Publishers
-    video_stream_pub = None
     tello_pose_pub = None
-    tello_flight_data_pub = None
 
     robot_vel_world_pub = None
     robot_vel_robot_pub = None
@@ -75,11 +68,11 @@ class TelloDriverRos:
                 self.tello_vel_cmd_unstamped_callback,
             )
 
-        # self.tello_vel_cmd_stamped_sub = rospy.Subscriber(
-        #     self.tello_vel_cmd_stamped_topic_name,
-        #     Twist,
-        #     self.tello_vel_cmd_stamped_callback,
-        # )
+        self.tello_vel_cmd_stamped_sub = rospy.Subscriber(
+            self.tello_vel_cmd_stamped_topic_name,
+            TwistStamped,
+            self.tello_vel_cmd_stamped_callback,
+        )
 
     def init_timers(self):
         self.pub_step_timer = rospy.Timer(
