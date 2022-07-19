@@ -52,30 +52,45 @@ class TelloDriverRos:
 
     def begin(self):
         rospy.init_node("Tello_driver_ros")
+        print("[info] [Tello_driver_ros]- Initializing Tello driver ros node")
         self.init_pub()
         self.init_sub()
         self.init_timers()
         self.driver.begin()
 
     def init_pub(self):
+        print(
+            f"[info] [Tello_driver_ros]- Pubblishing tello pose to <{self.tello_pose_topic_name}>"
+        )
         self.tello_pose_pub = rospy.Publisher(
             self.tello_pose_topic_name, PoseStamped, queue_size=1
         )
 
     def init_sub(self):
         if self.flag_sub_tello_vel_cmd_unstamped:
+            print(
+                "[info] [Tello_driver_ros] - Command velocity unstamped topic enabled"
+            )
+            print(
+                f"[info] [Tello_driver_ros]- Subscribing to <{self.tello_vel_cmd_unstamped_topic_name}> topic"
+            )
             self.tello_vel_cmd_unstamped_sub = rospy.Subscriber(
                 self.tello_vel_cmd_unstamped_topic_name,
                 Twist,
                 self.tello_vel_cmd_unstamped_callback,
             )
-
+        print(
+            f"[info] [Tello_driver_ros]- Subscribing to <{self.tello_vel_cmd_stamped_topic_name}> topic"
+        )
         self.tello_vel_cmd_stamped_sub = rospy.Subscriber(
             self.tello_vel_cmd_stamped_topic_name,
             TwistStamped,
             self.tello_vel_cmd_stamped_callback,
         )
 
+        print(
+            f"[info] [Tello_driver_ros]- Subscribing to <{self.tello_collision_topic_name}> topic"
+        )
         self.robot_collision_sub = rospy.Subscriber(
             self.tello_collision_topic_name, Bool, self.tello_collision_callback
         )
@@ -86,6 +101,7 @@ class TelloDriverRos:
         )
 
     def read_params(self):
+        print("[info] [Tello_driver_ros] - Reading parameters")
         self.tello_vel_cmd_unstamped_topic_name = rospy.get_param(
             "/tello_driver_node/tello_vel_cmd_unstamped_topic_name",
             default=self.tello_vel_cmd_unstamped_topic_name,
@@ -146,7 +162,9 @@ class TelloDriverRos:
 
     def tello_collision_callback(self, msg):
         self.driver.set_flag_collision_detected(msg.data)
-        self.driver.set_flag_collision_detected(False) # fix while not having the object detection working
+        self.driver.set_flag_collision_detected(
+            False
+        )  # fix while not having the object detection working
 
     # +------------------+
     # | End of Callbacks |

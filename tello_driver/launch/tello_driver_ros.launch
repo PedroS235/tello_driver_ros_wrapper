@@ -23,7 +23,7 @@
   <arg name="tello_frame_name" default="tello_base_link" />
   <arg name="tello_world_frame_name" default="world" />
 
-  <node name="$(arg tello_driver_name)" pkg="tello_driver" type="tello_driver_ros_node.py">
+  <node name="$(arg tello_driver_name)" pkg="tello_driver" type="tello_driver_ros_node.py" output="screen">
   
     <param name="tello_takeoff_topic_name" value="$(arg tello_takeoff_topic_name)" type="string" />
     <param name="tello_land_topic_name" value="$(arg tello_land_topic_name)" type="string" />

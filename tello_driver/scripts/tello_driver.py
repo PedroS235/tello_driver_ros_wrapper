@@ -43,6 +43,8 @@ class TelloDriver(object):
     _connect_to_tello_wifi_auto = True
     flag_collision_detected = False
 
+    curr_time = time.time()
+
     def __init__(self):
 
         # ROS OpenCV bridge
@@ -50,12 +52,13 @@ class TelloDriver(object):
 
         # connect to the drone
         self._tello = Tello()
+        self._tello.set_loglevel(self._tello.LOG_WARN)
 
         # - Setting shutdown routine
         rospy.on_shutdown(self._shutdown_routine)
 
     def begin(self):
-
+        print("[info] [Tello_driver] - Initiating Tello driver")
         self.read_params()
 
         self._init_pub()
@@ -66,14 +69,28 @@ class TelloDriver(object):
         self._start_video_threads()
 
     def _init_pub(self):
-        self._image_pub = rospy.Publisher("image/image_raw", Image, queue_size=1)
+        print(
+            f"[info] [Tello_driver] - Publishing drone image to <{self.tello_image_topic_name}>"
+        )
+        self._image_pub = rospy.Publisher(
+            self.tello_image_topic_name, Image, queue_size=1
+        )
+        print(
+            f"[info] [Tello_driver] - Publishing drone flight data to <{self.tello_flight_data_topic_name}>"
+        )
         self._flight_data_pub = rospy.Publisher(
             self.tello_flight_data_topic_name, FlightData, queue_size=1
         )
 
     def _init_sub(self):
+        print(
+            f"[info] [Tello_driver] - Subscribing to <{self.tello_takeoff_topic_name} topic>"
+        )
         rospy.Subscriber(
             self.tello_takeoff_topic_name, Empty, self._takeoff_callback, queue_size=1
+        )
+        print(
+            f"[info] [Tello_driver] - Subscribing to <{self.tello_land_topic_name} topic>"
         )
         rospy.Subscriber(
             self.tello_land_topic_name, Empty, self._land_callback, queue_size=1
@@ -81,6 +98,7 @@ class TelloDriver(object):
         self._tello.subscribe(self._tello.EVENT_FLIGHT_DATA, self._flight_data_handler)
 
     def read_params(self):
+        print("[info] - Reading parameters")
         self.tello_takeoff_topic_name = rospy.get_param(
             "/tello_driver_node/tello_takeoff_topic_name",
             default=self.tello_takeoff_topic_name,
@@ -111,6 +129,7 @@ class TelloDriver(object):
         )
 
     def set_cmd_vel(self, lin_cmd_vel, ang_cmd_vel):
+        # TODO: in case a collision is detected only allow to move away from the obstacle
         if self.flag_collision_detected:
             # - Linear cmd_vel
             self._tello.set_pitch(0)  # linear X value
@@ -130,6 +149,8 @@ class TelloDriver(object):
 
     def set_flag_collision_detected(self, flag):
         self.flag_collision_detected = flag
+        if self.flag_collision_detected:
+            print("[info] [Tello_driver] - Coollision detected")
 
     # +--------------------+
     # | Start of Callbacks |
@@ -137,10 +158,12 @@ class TelloDriver(object):
 
     def _takeoff_callback(self, msg):
         msg  # - just for not having linting errors
+        print("[info] [Tello_driver] - Taking off")
         self._tello.takeoff()
 
     def _land_callback(self, msg):
         msg  # - just for not having linting errors
+        print("[info] [Tello_driver] - Landing")
         self._tello.land()
 
     def _flight_data_handler(self, event, sender, data):
@@ -171,6 +194,12 @@ class TelloDriver(object):
         flight_data.wifi_strength = data.wifi_strength
         flight_data.wifi_disturb = data.wifi_disturb
 
+        if time.time() - self.curr_time >= 5:
+            print(
+                f"[info] [Tello_driver] - Drone's battery percentage is {flight_data.battery_percentage}%"
+            )
+            self.curr_time = time.time()
+
         # - Publish Flight data
         self._flight_data_pub.publish(flight_data)
 
@@ -190,7 +219,7 @@ class TelloDriver(object):
 
         container = av.open(video_stream)
 
-        rospy.loginfo("video stream is starting")
+        print("[info] [Tello_driver] - video stream is starting")
 
         for frame in container.decode(video=0):
             if self._frame_skip > 0:
@@ -232,10 +261,13 @@ class TelloDriver(object):
         self._video_thread.join(timeout=2)
 
     def _connect_to_tello_network(self):
+        print("[info] [Tello_driver] - Connecting to drone")
         if self._connect_to_tello_wifi_auto:
-            if not cwd.connect_device(self.tello_ssid, self.tello_pw):
+            if not cwd.connect_device(self.tello_ssid, self.tello_pw, verbose=False):
+                print("[error] [Tello_driver] - Connection to drone unsuccessful!")
                 rospy.signal_shutdown(
                     "Not able to establish connection with Tello network"
                 )
         self._tello.connect()
         self._tello.wait_for_connection(5)
+        print("[info] [Tello_driver] - Connection to drone successfull")
