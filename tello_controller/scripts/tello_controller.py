@@ -31,7 +31,7 @@ class TelloController:
 
         self.init_pub()
 
-        self.rate = rospy.Rate(0.2)
+        self.rate = rospy.Rate(25)
 
         self._keyboard_listener.start()
 

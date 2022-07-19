@@ -16,7 +16,7 @@ import rospy
 
 from sensor_msgs.msg import Image
 from std_msgs.msg import Empty
-from tello_ros_msgs.msg import FlightData
+from tello_msgs.msg import FlightData
 from utils import connect_wifi_device as cwd
 
 # - End of imports
@@ -127,7 +127,7 @@ class TelloDriver(object):
 
             # - Angular cmd_vel
             self._tello.set_yaw(ang_cmd_vel[2])  # angualr Z value
-    
+
     def set_flag_collision_detected(self, flag):
         self.flag_collision_detected = flag
 

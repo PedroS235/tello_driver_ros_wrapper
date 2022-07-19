@@ -7,8 +7,8 @@ from tello_driver import TelloDriver
 
 
 # - ROS messages imports
-from geometry_msgs.msg import Twist, TwistStamped, PoseStamped, Header
-from std_msgs.msg import Bool
+from geometry_msgs.msg import Twist, TwistStamped, PoseStamped
+from std_msgs.msg import Bool, Header
 
 
 class TelloDriverRos:
@@ -146,6 +146,7 @@ class TelloDriverRos:
 
     def tello_collision_callback(self, msg):
         self.driver.set_flag_collision_detected(msg.data)
+        self.driver.set_flag_collision_detected(False) # fix while not having the object detection working
 
     # +------------------+
     # | End of Callbacks |
