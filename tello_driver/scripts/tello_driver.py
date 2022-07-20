@@ -166,22 +166,28 @@ class TelloDriver(object):
 
     def set_cmd_vel(self, lin_cmd_vel, ang_cmd_vel):
         # TODO: in case a collision is detected only allow to move away from the obstacle
-        if self._tello_vel_cmd_flag:
-            # - Linear cmd_vel
-            self._tello.set_pitch(0)  # linear X value
-            self._tello.set_roll(0)  # linear Y value
-            self._tello.set_throttle(0)  # linear Z value
-
-            # - Angular cmd_vel
-            self._tello.set_yaw(0)  # angualr Z value
-        else:
+        if self._tello_vel_cmd_flag["lin"]["x"]:
             # - Linear cmd_vel
             self._tello.set_pitch(lin_cmd_vel[0])  # linear X value
-            self._tello.set_roll(lin_cmd_vel[1])  # linear Y value
-            self._tello.set_throttle(lin_cmd_vel[2])  # linear Z value
+        else:
+            self._tello.set_pitch(0)  # linear X value
 
-            # - Angular cmd_vel
-            self._tello.set_yaw(ang_cmd_vel[2])  # angualr Z value
+        if self._tello_vel_cmd_flag["lin"]["y"]:
+            # - Linear cmd_vel
+            self._tello.set_roll(lin_cmd_vel[1])  # linear Y value
+        else:
+            self._tello.set_roll(0)  # linear Y value
+
+        if self._tello_vel_cmd_flag["lin"]["z"]:
+            # - Linear cmd_vel
+            self._tello.set_throttle(lin_cmd_vel[2])  # linear Z value
+        else:
+            self._tello.set_throttle(0)  # linear Z value
+
+        if self._tello_vel_cmd_flag["ang"]["z"]:
+            self._tello.set_yaw(ang_cmd_vel[2])  # angular Z value
+        else:
+            self._tello.set_yaw(0)  # angular Z value
 
     def set__collision_detected_flag(self, flag):
         self._collision_detected_flag = flag
