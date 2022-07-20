@@ -16,7 +16,7 @@ import rospy
 
 from sensor_msgs.msg import Image
 from std_msgs.msg import Empty
-from tello_msgs.msg import FlightData
+from tello_msgs.msg import FlightData, FlipControl
 from utils import connect_wifi_device as cwd
 
 # - End of imports
@@ -35,6 +35,7 @@ class TelloDriver(object):
 
     # - Topics
     tello_takeoff_topic_name = "/tello/takeoff"
+    tello_flip_control_topic_name = "/tello/flip_control"
     tello_land_topic_name = "/tello/land"
     tello_image_topic_name = "/tello/camera/image_raw"
     tello_flight_data_topic_name = "/tello_flight_data"
@@ -89,12 +90,24 @@ class TelloDriver(object):
         rospy.Subscriber(
             self.tello_takeoff_topic_name, Empty, self._takeoff_callback, queue_size=1
         )
+
         print(
             f"[info] [Tello_driver] - Subscribing to <{self.tello_land_topic_name} topic>"
         )
         rospy.Subscriber(
             self.tello_land_topic_name, Empty, self._land_callback, queue_size=1
         )
+
+        print(
+            f"[info] [Tello_driver] - Subscribing to <{self.tello_flip_control_topic_name} topic>"
+        )
+        rospy.Subscriber(
+            self.tello_flip_control_topic_name,
+            FlipControl,
+            self._flip_control_callback,
+            queue_size=1,
+        )
+
         self._tello.subscribe(self._tello.EVENT_FLIGHT_DATA, self._flight_data_handler)
 
     def read_params(self):
@@ -107,6 +120,10 @@ class TelloDriver(object):
             "/tello_driver_node/tello_land_topic_name",
             default=self.tello_land_topic_name,
         )
+        # self.tello_flip_control_topic_name = rospy.get_param(
+        #     "/tello_driver_node/tello_flip_control_topic_name",
+        #     default=self.tello_land_topic_name,
+        # )
         self.tello_image_topic_name = rospy.get_param(
             "/tello_driver_node/tello_image_topic_name",
             default=self.tello_image_topic_name,
@@ -165,6 +182,18 @@ class TelloDriver(object):
         msg  # - just for not having linting errors
         print("[info] [Tello_driver] - Landing")
         self._tello.land()
+
+    def _flip_control_callback(self, msg):
+        print("flip controll")
+        print(msg)
+        if msg.flip_forward:
+            self._tello.flip_forward()
+        elif msg.flip_backward:
+            self._tello.flip_backward()
+        elif msg.flip_left:
+            self._tello.flip_left()
+        elif msg.flip_right:
+            self._tello.flip_right()
 
     def _flight_data_handler(self, event, sender, data):
         flight_data = FlightData()

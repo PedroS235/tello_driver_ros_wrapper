@@ -2,6 +2,6 @@
 
   <arg name="tello_controller_name" default="tello_controller" />
 
-  <node name="$(arg tello_controller_name)" pkg="tello_controller" type="tello_controller.py"></node>
+  <node name="$(arg tello_controller_name)" pkg="tello_controller" type="tello_controller.py" output="screen"></node>
 
 </launch>

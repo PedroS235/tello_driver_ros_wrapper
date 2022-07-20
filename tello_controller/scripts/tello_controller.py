@@ -4,6 +4,7 @@ import rospy
 from pynput import keyboard
 from geometry_msgs.msg import Twist
 from std_msgs.msg import Empty
+from tello_msgs.msg import FlipControl
 
 
 class TelloController:
@@ -12,8 +13,24 @@ class TelloController:
     tello_vel_cmd_unstamped_topic_name = "/tello/cmd_vel_unstamped"
     tello_takeoff_topic_name = "/tello/takeoff"
     tello_land_topic_name = "/tello/land"
+    tello_flip_control_topic_name = "/tello/flip_control"
 
     def __init__(self):
+        print("--------------------------------------------")
+        print("Controller Controls:")
+        print("t: takeoff")
+        print("l: land")
+        print("x: more speed")
+        print("z: less speed")
+        print("w: pitch forward")
+        print("s: pitch backward")
+        print("a: roll left")
+        print("d: roll right")
+        print("up arrow: + throttle -> more altitude")
+        print("down arrow: - throttle -> less altitude")
+        print("left arrow: yaw conter clockwise")
+        print("right arrow: yaw clockwise")
+        print("--------------------------------------------")
         self.key_pressed = {
             "th": 0,
             "right": 0,
@@ -48,6 +65,10 @@ class TelloController:
             self.tello_land_topic_name, Empty, queue_size=1
         )
 
+        self._flip_control_pub = rospy.Publisher(
+            self.tello_flip_control_topic_name, FlipControl, queue_size=1
+        )
+
     def read_params(self):
         self.tello_takeoff_topic_name = rospy.get_param(
             "/tello_driver_node/tello_takeoff_topic_name",
@@ -76,6 +97,43 @@ class TelloController:
                 self._takeoff_pub.publish(Empty())
             if key.char == "l":
                 self._land_pub.publish(Empty())
+            if key.char == "z":
+                self.speed -= 0.1
+                if self.speed < 0.1:
+                    self.speed = 0.1
+            if key.char == "x":
+                self.speed += 0.1
+                if self.speed > 1:
+                    self.speed = 1
+            if key.char == "[":
+                msg = FlipControl()
+                msg.flip_forward = True
+                msg.flip_backward = False
+                msg.flip_left = False
+                msg.flip_right = False
+                self._flip_control_pub.publish(msg)
+                msg.flip_right = False
+            if key.char == "'":
+                msg = FlipControl()
+                msg.flip_forward = False
+                msg.flip_backward = True
+                msg.flip_left = False
+                msg.flip_right = False
+                self._flip_control_pub.publish(msg)
+            if key.char == ";":
+                msg = FlipControl()
+                msg.flip_forward = False
+                msg.flip_backward = False
+                msg.flip_left = True
+                msg.flip_right = False
+                self._flip_control_pub.publish(msg)
+            if key.char == "\\":
+                msg = FlipControl()
+                msg.flip_forward = False
+                msg.flip_backward = False
+                msg.flip_left = False
+                msg.flip_right = True
+                self._flip_control_pub.publish(msg)
         except AttributeError:
             pass
 
@@ -103,6 +161,35 @@ class TelloController:
                 self.key_pressed["right"] = 0
             if key.char == "a":
                 self.key_pressed["right"] = 0
+            if key.char == "[":
+                msg = FlipControl()
+                msg.flip_forward = False
+                msg.flip_backward = False
+                msg.flip_left = False
+                msg.flip_right = False
+                self._flip_control_pub.publish(msg)
+                msg.flip_right = False
+            if key.char == "'":
+                msg = FlipControl()
+                msg.flip_forward = False
+                msg.flip_backward = False
+                msg.flip_left = False
+                msg.flip_right = False
+                self._flip_control_pub.publish(msg)
+            if key.char == ";":
+                msg = FlipControl()
+                msg.flip_forward = False
+                msg.flip_backward = False
+                msg.flip_left = False
+                msg.flip_right = False
+                self._flip_control_pub.publish(msg)
+            if key.char == "\\":
+                msg = FlipControl()
+                msg.flip_forward = False
+                msg.flip_backward = False
+                msg.flip_left = False
+                msg.flip_right = False
+                self._flip_control_pub.publish(msg)
         except AttributeError:
             pass
 
