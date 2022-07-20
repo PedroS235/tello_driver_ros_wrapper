@@ -189,7 +189,7 @@ class TelloDriver(object):
         if msg.flip_forward:
             self._tello.flip_forward()
         elif msg.flip_backward:
-            self._tello.flip_backward()
+            self._tello.flip_back()
         elif msg.flip_left:
             self._tello.flip_left()
         elif msg.flip_right:
