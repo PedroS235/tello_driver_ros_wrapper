@@ -6,13 +6,13 @@ import time
 class Landed(smach.State):
 
   def __init__(self):
-    smach.State.__init__(self, outcomes=['takeoff', 'quit'])
+    smach.State.__init__(self, outcomes=["takeoff", "quit"])
 
     #ROS subscriptions
     rospy.Subscriber('keyboard_input', String, self.get_keyboard_input_callback, queue_size = 1)
 
     #ROS publishers
-    self._takeoff_pub = rospy.Publisher('takeoff', Empty, queue_size = 1)
+    self._takeoff_pub = rospy.Publisher('tello/takeoff', Empty, queue_size = 1)
 
   def get_keyboard_input_callback(self, msg):
     self._keyboard_input = msg
@@ -36,7 +36,7 @@ class Landed(smach.State):
 
         return 'takeoff'
 
-      elif self._keyboard_input == String("q"):
+      elif self._keyboard_input == String("^["):
         waiting = False
 
         return 'quit'

@@ -6,13 +6,13 @@ import time
 class Hovering(smach.State):
 
   def __init__(self):
-    smach.State.__init__(self, outcomes=['land', 'keyboard'])
+    smach.State.__init__(self, outcomes=["land", "keyboard", "quit"])
 
     #ROS subscriptions
     rospy.Subscriber('keyboard_input', String, self.get_keyboard_input_callback, queue_size = 1)
 
     #ROS publishers
-    self._land_pub = rospy.Publisher('land', Empty, queue_size = 1)
+    self._land_pub = rospy.Publisher('tello/land', Empty, queue_size = 1)
 
   def get_keyboard_input_callback(self, msg):
     self._keyboard_input = msg
@@ -40,3 +40,14 @@ class Hovering(smach.State):
         waiting = False
 
         return 'keyboard'
+
+      elif self._keyboard_input == String("^["):
+        empty_message = Empty()
+
+        time.sleep(2)
+
+        self._land_pub.publish(empty_message)
+
+        waiting = False
+
+        return 'quit'

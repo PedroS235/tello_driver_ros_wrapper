@@ -1,7 +1,13 @@
 #!/usr/bin/env python3
 import rospy
+import rospkg
+import sys
 
+
+path = rospkg.RosPack().get_path("tello_controller") + "/scripts"
+sys.path.append(path)
 from tello_driver_ros import TelloDriverRos
+import tello_controller
 
 
 def main():

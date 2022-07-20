@@ -24,12 +24,12 @@ class Sate_Machine(object):
             smach.StateMachine.add(
                 "HOVERING",
                 Hovering(),
-                transitions={"land": "LANDED", "keyboard": "KEYBOARD_CONTROL"},
+                transitions={"land": "LANDED", "keyboard": "KEYBOARD_CONTROL", "quit": "done"},
             )
             smach.StateMachine.add(
                 "KEYBOARD_CONTROL",
                 Keyboard_control(),
-                transitions={"land": "LANDED", "hover": "HOVERING"},
+                transitions={"land": "LANDED", "hover": "HOVERING", "quit": "done"},
             )
 
         outcome = self._state_machine.execute()
@@ -37,9 +37,3 @@ class Sate_Machine(object):
 
 if __name__ == "__main__":
     drone_intelligence = Sate_Machine()
-
-    # spin until interrupted
-    try:
-        rospy.spin()
-    except:
-        pass

@@ -24,7 +24,7 @@ class Keyboard_listener(object):
             if key.char in ("t", "l", "k", "s"):
                 self._user_input_pub.publish(str(key).strip("'"))
         except AttributeError as ex:
-            pass
+                self._user_input_pub.publish("^[")
 
     def on_release_callback(self, key):
         try:
