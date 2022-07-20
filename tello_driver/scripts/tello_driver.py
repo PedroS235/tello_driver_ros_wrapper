@@ -32,6 +32,7 @@ class TelloDriver(object):
     # - Subscribers
     tello_takeoff_sub = None
     tello_land_sub = None
+    tello_flip_controll_sub = None
 
     # - Topics
     tello_takeoff_topic_name = "/tello/takeoff"
@@ -39,6 +40,13 @@ class TelloDriver(object):
     tello_land_topic_name = "/tello/land"
     tello_image_topic_name = "/tello/camera/image_raw"
     tello_flight_data_topic_name = "/tello_flight_data"
+
+    # - Timers
+    _battery_percentage_display_timer = None
+    _battery_percentage_timer_interval = (
+        5.0  # will display to screen battery percentage every 5 seconds
+    )
+    _current_battery_percentage = 0
 
     # - Booleans
     _connect_to_tello_wifi_auto = True
@@ -62,10 +70,11 @@ class TelloDriver(object):
         print("[info] [Tello_driver] - Initiating Tello driver")
         self.read_params()
 
+        self._connect_to_tello_network()
+
         self._init_pub()
         self._init_sub()
-
-        self._connect_to_tello_network()
+        self._init_timers()
 
         self._start_video_threads()
 
@@ -87,14 +96,14 @@ class TelloDriver(object):
         print(
             f"[info] [Tello_driver] - Subscribing to <{self.tello_takeoff_topic_name} topic>"
         )
-        rospy.Subscriber(
+        self.tello_takeoff_sub = rospy.Subscriber(
             self.tello_takeoff_topic_name, Empty, self._takeoff_callback, queue_size=1
         )
 
         print(
             f"[info] [Tello_driver] - Subscribing to <{self.tello_land_topic_name} topic>"
         )
-        rospy.Subscriber(
+        self.tello_land_sub = rospy.Subscriber(
             self.tello_land_topic_name, Empty, self._land_callback, queue_size=1
         )
 
@@ -110,6 +119,12 @@ class TelloDriver(object):
 
         self._tello.subscribe(self._tello.EVENT_FLIGHT_DATA, self._flight_data_handler)
 
+    def _init_timers(self):
+        self._battery_percentage_display_timer = rospy.Timer(
+            rospy.Duration(self._battery_percentage_timer_interval),
+            self._battery_percentage_display_timer_callback,
+        )
+
     def read_params(self):
         print("[info] - Reading parameters")
         self.tello_takeoff_topic_name = rospy.get_param(
@@ -120,10 +135,10 @@ class TelloDriver(object):
             "/tello_driver_node/tello_land_topic_name",
             default=self.tello_land_topic_name,
         )
-        # self.tello_flip_control_topic_name = rospy.get_param(
-        #     "/tello_driver_node/tello_flip_control_topic_name",
-        #     default=self.tello_land_topic_name,
-        # )
+        self.tello_flip_control_topic_name = rospy.get_param(
+            "/tello_driver_node/tello_flip_control_topic_name",
+            default=self.tello_flight_data_topic_name,
+        )
         self.tello_image_topic_name = rospy.get_param(
             "/tello_driver_node/tello_image_topic_name",
             default=self.tello_image_topic_name,
@@ -183,6 +198,11 @@ class TelloDriver(object):
         print("[info] [Tello_driver] - Landing")
         self._tello.land()
 
+    def _battery_percentage_display_timer_callback(self, msg):
+        print(
+            f"[info] [Tello_driver] - Drone's battery percentage is {self._current_battery_percentage}%"
+        )
+
     def _flip_control_callback(self, msg):
         print("flip controll")
         print(msg)
@@ -223,11 +243,7 @@ class TelloDriver(object):
         flight_data.wifi_strength = data.wifi_strength
         flight_data.wifi_disturb = data.wifi_disturb
 
-        if time.time() - self.curr_time >= 5:
-            print(
-                f"[info] [Tello_driver] - Drone's battery percentage is {flight_data.battery_percentage}%"
-            )
-            self.curr_time = time.time()
+        self._current_battery_percentage = flight_data.battery_percentage
 
         # - Publish Flight data
         self._flight_data_pub.publish(flight_data)
