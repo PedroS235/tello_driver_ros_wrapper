@@ -22,10 +22,10 @@ class TelloController:
         print("l: land")
         print("x: more speed")
         print("z: less speed")
-        print("[: flip forward")
-        print("': flip backward")
-        print(";: flip left")
-        print("\\: flip right")
+        print("shift + up arrow: flip forward")
+        print("shift + down arrow: flip backward")
+        print("shift + left arrow: flip left")
+        print("shift + right arrow: flip right")
         print("w: pitch forward")
         print("s: pitch backward")
         print("a: roll left")
@@ -45,6 +45,7 @@ class TelloController:
         self._keyboard_listener = keyboard.Listener(
             on_press=self.on_press, on_release=self.on_release
         )
+        self.shift_key_pressed = False
 
     def begin(self):
         rospy.init_node("Tello Controller", anonymous=True)
@@ -88,6 +89,7 @@ class TelloController:
         )
 
     def on_press(self, key):
+        print(f"pressing the key {key}")
         try:
             if key.char == "w":
                 self.key_pressed["forward"] = self.speed
@@ -109,7 +111,13 @@ class TelloController:
                 self.speed += 0.1
                 if self.speed > 1:
                     self.speed = 1
-            if key.char == "[":
+        except AttributeError:
+            pass
+
+        try:
+            if key == key.shift:
+                self.shift_key_pressed = True
+            if key == key.up and self.shift_key_pressed:
                 msg = FlipControl()
                 msg.flip_forward = True
                 msg.flip_backward = False
@@ -117,44 +125,43 @@ class TelloController:
                 msg.flip_right = False
                 self._flip_control_pub.publish(msg)
                 msg.flip_right = False
-            if key.char == "'":
+            if key == key.down and self.shift_key_pressed:
                 msg = FlipControl()
                 msg.flip_forward = False
                 msg.flip_backward = True
                 msg.flip_left = False
                 msg.flip_right = False
                 self._flip_control_pub.publish(msg)
-            if key.char == ";":
+            if key == key.left and self.shift_key_pressed:
                 msg = FlipControl()
                 msg.flip_forward = False
                 msg.flip_backward = False
                 msg.flip_left = True
                 msg.flip_right = False
                 self._flip_control_pub.publish(msg)
-            if key.char == "\\":
+            if key == key.right and self.shift_key_pressed:
                 msg = FlipControl()
                 msg.flip_forward = False
                 msg.flip_backward = False
                 msg.flip_left = False
                 msg.flip_right = True
                 self._flip_control_pub.publish(msg)
-        except AttributeError:
-            pass
 
-        try:
-            if key == key.up:
+            if key == key.up and not self.shift_key_pressed:
                 self.key_pressed["th"] = self.speed
-            if key == key.down:
+            if key == key.down and not self.shift_key_pressed:
                 self.key_pressed["th"] = -self.speed
-            if key == key.left:
+            if key == key.left and not self.shift_key_pressed:
                 self.key_pressed["cw"] = -self.speed
-            if key == key.right:
+            if key == key.right and not self.shift_key_pressed:
                 self.key_pressed["cw"] = self.speed
+
         except AttributeError:
             pass
 
     def on_release(self, key):
         if key == keyboard.Key.esc:
+            rospy.signal_shutdown("Stopping keyboard listener")
             return False
         try:
             if key.char == "w":
@@ -165,47 +172,52 @@ class TelloController:
                 self.key_pressed["right"] = 0
             if key.char == "a":
                 self.key_pressed["right"] = 0
-            if key.char == "[":
-                msg = FlipControl()
-                msg.flip_forward = False
-                msg.flip_backward = False
-                msg.flip_left = False
-                msg.flip_right = False
-                self._flip_control_pub.publish(msg)
-                msg.flip_right = False
-            if key.char == "'":
-                msg = FlipControl()
-                msg.flip_forward = False
-                msg.flip_backward = False
-                msg.flip_left = False
-                msg.flip_right = False
-                self._flip_control_pub.publish(msg)
-            if key.char == ";":
-                msg = FlipControl()
-                msg.flip_forward = False
-                msg.flip_backward = False
-                msg.flip_left = False
-                msg.flip_right = False
-                self._flip_control_pub.publish(msg)
-            if key.char == "\\":
-                msg = FlipControl()
-                msg.flip_forward = False
-                msg.flip_backward = False
-                msg.flip_left = False
-                msg.flip_right = False
-                self._flip_control_pub.publish(msg)
         except AttributeError:
             pass
 
         try:
-            if key == key.up:
+            if key == key.shift:
+                self.shift_key_pressed = False
+
+            if key == key.up and self.shift_key_pressed:
+                msg = FlipControl()
+                msg.flip_forward = False
+                msg.flip_backward = False
+                msg.flip_left = False
+                msg.flip_right = False
+                self._flip_control_pub.publish(msg)
+                msg.flip_right = False
+            if key == key.down and self.shift_key_pressed:
+                msg = FlipControl()
+                msg.flip_forward = False
+                msg.flip_backward = False
+                msg.flip_left = False
+                msg.flip_right = False
+                self._flip_control_pub.publish(msg)
+            if key == key.left and self.shift_key_pressed:
+                msg = FlipControl()
+                msg.flip_forward = False
+                msg.flip_backward = False
+                msg.flip_left = False
+                msg.flip_right = False
+                self._flip_control_pub.publish(msg)
+            if key == key.right and self.shift_key_pressed:
+                msg = FlipControl()
+                msg.flip_forward = False
+                msg.flip_backward = False
+                msg.flip_left = False
+                msg.flip_right = False
+                self._flip_control_pub.publish(msg)
+
+            if key == key.up and not self.shift_key_pressed:
                 self.key_pressed["th"] = 0
-            if key == key.down:
+            if key == key.down and not self.shift_key_pressed:
                 self.key_pressed["th"] = 0
-            if key == key.left:
+            if key == key.left and not self.shift_key_pressed:
                 self.key_pressed["cw"] = 0
-            if key == key.right:
+            if key == key.right and not self.shift_key_pressed:
                 self.key_pressed["cw"] = 0
+
         except AttributeError:
             pass
 
