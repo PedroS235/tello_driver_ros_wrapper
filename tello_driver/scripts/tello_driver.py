@@ -48,9 +48,13 @@ class TelloDriver(object):
     )
     _current_battery_percentage = 0
 
-    # - Booleans
+    # - Flags
     _connect_to_tello_wifi_auto = True
-    flag_collision_detected = False
+    _collision_detected_flag = False
+    _tello_vel_cmd_flag = {
+        "lin": {"x": True, "y": True, "z": True},
+        "ang": {"z": True},
+    }
 
     curr_time = time.time()
 
@@ -162,7 +166,7 @@ class TelloDriver(object):
 
     def set_cmd_vel(self, lin_cmd_vel, ang_cmd_vel):
         # TODO: in case a collision is detected only allow to move away from the obstacle
-        if self.flag_collision_detected:
+        if self._tello_vel_cmd_flag:
             # - Linear cmd_vel
             self._tello.set_pitch(0)  # linear X value
             self._tello.set_roll(0)  # linear Y value
@@ -179,9 +183,9 @@ class TelloDriver(object):
             # - Angular cmd_vel
             self._tello.set_yaw(ang_cmd_vel[2])  # angualr Z value
 
-    def set_flag_collision_detected(self, flag):
-        self.flag_collision_detected = flag
-        if self.flag_collision_detected:
+    def set__collision_detected_flag(self, flag):
+        self._collision_detected_flag = flag
+        if self._collision_detected_flag:
             print("[info] [Tello_driver] - Coollision detected")
 
     # +--------------------+
