@@ -16,12 +16,11 @@ There are 2 types of **command velocity** topics. One with time stamp and one wi
 * command velocity unstamped topic name: `tello/cmd_vel_unstamped`
 * command velocity stamped topic name: `tello/cmd_vel_stamped`
 
-### Topics for triggering the takeoff and landing of the Tello
+### Topics for triggering actions to the Tello
 
-In order to inform the drone to land or takeoff, there are 2 additional topics which operate with empty messages.
-
-* takeoff topic name: `tello/takeoff`
-* land topic name: `tello/land`
+* takeoff topic name: `tello/takeoff` (send an empty message)
+* land topic name: `tello/land` (send an empty message)
+* Perform flips topic name: `tello/flip_control`
 
 ***
 
