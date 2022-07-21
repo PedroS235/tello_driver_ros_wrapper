@@ -14,6 +14,7 @@ add_message_files(
   FILES
   FlightData.msg
   FlipControl.msg
+  PressedKeys.msg
 )
 
 
