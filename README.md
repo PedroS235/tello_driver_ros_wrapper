@@ -1,43 +1,65 @@
 # Introduction
 
-Tello_ros_wrapper is a ros metapackage that containst multiple ros packages to control DJI Tello drone.
-In it's core lies the package **tello_ros_driver** which is responsible to send the commands to the drone.
-In addition, a package **tello_ros_controller** is provided to be able to communicate with the drone via keyboard.
-As for the rest of the packages, the purpose of them are to make the tello autonomous by integrating obstacle avoidance for instance. (To be done)
+Tello _driver_ros_wrapper_ is a simple ROS metapackage that allows to control DJI Tello drone via ROS topics.
+In order to communicate with the drone, the python library `tellopy` is being used which can be found [here](https://github.com/hanyazou/TelloPy).
+At this moment, the pose of the drone is being published by the help of a optitrack system, where it is reading the information from the TF frame _world_ to _robot_base_link_.
+In case there is not such transform available no drone pose will be published.
 
-***
+In this ROS metapackage, there lies 2 ROS packages, the **tello_driver** and the **tello_msgs**.
+The **tello_driver** is the core, where the **tello_msgs** only contains custom messages specifig to Tello, such as the flight data.
 
-## ROS topics
+---
 
-### Command velocity topics
+## The available ROS topics
 
-There are 2 types of **command velocity** topics. One with time stamp and one without.
+- `tello_takeoff_topic_name` (default: _tello/takeoff_)
+  - **Default:** `/tello/takeoff`
+  - **Purpose:** Trigger the drone to takeoff.
+  - **Use:** Send an empty msg.
+- `tello_land_topic_name` (default: _tello/land_)
+  - **Default:** `/tello/lang`
+  - **Purpose:** Trigger the drone to land.
+  - **Use:** Send an empty msg.
+- `tello_image_topic_name`
+  - **Default:** `/tello/camera/image_raw`
+  - **Purpose:** Publish the camera image to a ROS topic.
+- `tello_flight_data_topic_name`
+  - **Default:** `/tello/flight_data`
+  - **Purpose:** Publish the drone flight data to a ROS topic, such as the battery percentage.
+- `tello_vel_cmd_stamped_topic_name`
+  - **Default:** `/tello/cmd_vel_stamped`
+  - **Purpose:** Topic to control the drones velocity.
+- `tello_collision_topic_name`
+  - **Default:** `/tello/collision_detection`
+  - **Purpose:** Topic that tells the tello driver if it is about to collide. If so controls will be blocked.
+- `tello_flip_control_topic_name`
+  - **Default:** `/tello/flip_control`
+  - **Purpose:** Triggers the drone to perform a flip. Refer to `tello_msgs/msg/FlipControl` to see the type of the message to send.
 
-* command velocity unstamped topic name: `tello/cmd_vel_unstamped`
-* command velocity stamped topic name: `tello/cmd_vel_stamped`
-
-### Topics for triggering actions to the Tello
-
-* takeoff topic name: `tello/takeoff` (send an empty message)
-* land topic name: `tello/land` (send an empty message)
-* Perform flips topic name: `tello/flip_control`
-
-***
+---
 
 ## ROS parameters
 
-* `tello_takeoff_topic_name` (default: *tello/takeoff*)
-* `tello_land_topic_name` (default: *tello/land*)
-* `tello_image_topic_name` (default: *tello/camera/image_raw*)
-* `tello_flight_data_topic_name` (default: *tello/flight_data*)
-* `tello_vel_cmd_unstamped_topic_name` (default: *tello/cmd_vel_unstamped*)
-* `tello_vel_cmd_stamped_topic_name` (default: *tello/cmd_vel_stamped*)
-* `tello_frame_name` (default: *tello_base_link*)
-* `tello_world_frame_name` (default: *world*)
-* `tello_ssid` (default: *world*)
-* `tello_password` (default: )
+- `tello_frame_name`
+  - **Default:** `robot_base_link`
+- `tello_world_frame_name` (default: _world_)
+  - **Default:** `world`
+- `connect_to_tello_wifi_auto` (default: _world_)
+  - **Default:** `true`
+- `tello_ssid` (default: _world_)
+  - Only required if _connect_to_tello_wifi_auto_ is set to true
+- `tello_password`
+  - **Default:** None
 
-***
+---
+
+## How to run the Tello driver
+
+**Note: you should place this repository inside the `catkin_ws/src` folder!**
+
+1. go to your _catkin_ws_ and do `catkin_make` and source the `catkin_ws/devel` setup file(only needs to be done once)
+2. To launch the tello driver and making it to connect to the tello's wifi automatically run this command: `roslaunch tello_driver tello_driver_ros.launch tello_ssid:=<the ssid of tello's wifi>``
+3. To launch the tello driver and manually connect to the tello's wifi run this command: `roslaunch tello_driver tello_driver_ros.launch connect_to_tello_wifi_auto:=false`
 
 ## Dependencies
 
