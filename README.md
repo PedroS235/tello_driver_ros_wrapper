@@ -43,11 +43,11 @@ The **tello_driver** is the core, where the **tello_msgs** only contains custom 
 
 - `tello_frame_name`
   - **Default:** `robot_base_link`
-- `tello_world_frame_name` (default: _world_)
+- `tello_world_frame_name`
   - **Default:** `world`
-- `connect_to_tello_wifi_auto` (default: _world_)
+- `connect_to_tello_wifi_auto`
   - **Default:** `true`
-- `tello_ssid` (default: _world_)
+- `tello_ssid`
   - Only required if _connect_to_tello_wifi_auto_ is set to true
 - `tello_password`
   - **Default:** None
