@@ -145,29 +145,11 @@ class TelloDriver(object):
         print("[info] - Finished reading parameters")
 
     def set_cmd_vel(self, lin_cmd_vel, ang_cmd_vel):
-        # TODO: in case a collision is detected only allow to move away from the obstacle
-        if self._tello_vel_cmd_flag["lin"]["x"]:
-            # - Linear cmd_vel
+        if self._collision_detected_flag:
             self._tello.set_pitch(lin_cmd_vel[0])  # linear X value
-        else:
-            self._tello.set_pitch(0)  # linear X value
-
-        if self._tello_vel_cmd_flag["lin"]["y"]:
-            # - Linear cmd_vel
             self._tello.set_roll(lin_cmd_vel[1])  # linear Y value
-        else:
-            self._tello.set_roll(0)  # linear Y value
-
-        if self._tello_vel_cmd_flag["lin"]["z"]:
-            # - Linear cmd_vel
             self._tello.set_throttle(lin_cmd_vel[2])  # linear Z value
-        else:
-            self._tello.set_throttle(0)  # linear Z value
-
-        if self._tello_vel_cmd_flag["ang"]["z"]:
             self._tello.set_yaw(ang_cmd_vel[2])  # angular Z value
-        else:
-            self._tello.set_yaw(0)  # angular Z value
 
     def set__collision_detected_flag(self, flag):
         self._collision_detected_flag = flag
@@ -194,8 +176,7 @@ class TelloDriver(object):
         )
 
     def _flip_control_callback(self, msg):
-        print("flip controll")
-        print(msg)
+        print("[info] [Tello_driver] - Performing a flip")
         if msg.flip_forward:
             self._tello.flip_forward()
         elif msg.flip_backward:
@@ -267,10 +248,8 @@ class TelloDriver(object):
 
             # VIDEO RESOLUTION
             # original 960x720
-            # divided by 2 480x360
-            # divided by 3 320x240
-            # divided by 4 240x180
 
+            # Reduced image size to have less delay
             image = cv2.resize(image, (480, 360), interpolation=cv2.INTER_LINEAR)
 
             # convert OpenCV image => ROS Image message
@@ -297,7 +276,6 @@ class TelloDriver(object):
 
     def _connect_to_tello_network(self):
         print("[info] [Tello_driver] - Connecting to drone")
-        print("asdfasdfasfasdf", self._connect_to_tello_wifi_auto)
         if self._connect_to_tello_wifi_auto:
             if not cwd.connect_device(self.tello_ssid, self.tello_pw, verbose=False):
                 print("[error] [Tello_driver] - Connection to drone unsuccessful!")

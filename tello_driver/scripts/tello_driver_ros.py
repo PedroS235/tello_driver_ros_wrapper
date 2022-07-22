@@ -24,7 +24,6 @@ class TelloDriverRos:
 
     # - Subscribers
     robot_collision_sub = None
-    tello_vel_cmd_unstamped_sub = None
     tello_vel_cmd_stamped_sub = None
     robot_collision_sub = None
 
