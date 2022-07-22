@@ -13,7 +13,7 @@
 
     <!-- Tello WiFi credentials-->
     <arg name="connect_to_tello_wifi_auto" default="false" />
-    <arg name="tello_ssid" default="" if="$(eval arg('connect_to_tello_wife_auto') == false)"/>
+    <arg name="tello_ssid" default="" if="$(eval arg('connect_to_tello_wifi_auto') == false)"/>
     <arg name="tello_password" default="" />
 
     <!-- TF2 Frames -->
