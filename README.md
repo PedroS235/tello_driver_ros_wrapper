@@ -1,12 +1,13 @@
 # Introduction
 
-Tello _driver_ros_wrapper_ is a simple ROS metapackage that allows to control DJI Tello drone via ROS topics.
+Tello **driver_ros_wrapper** is a simple ROS metapackage that allows to control DJI Tello drone via ROS topics.
+
 In order to communicate with the drone, the python library `tellopy` is being used which can be found [here](https://github.com/hanyazou/TelloPy).
-At this moment, the pose of the drone is being published by the help of a optitrack system, where it is reading the information from the TF frame _world_ to _robot_base_link_.
+At this moment, the pose of the drone is being published by the help of an optitrack system, where it is reading the information from the TF frame _world_ to _robot_base_link_.
 In case there is not such transform available no drone pose will be published.
 
 In this ROS metapackage, there lies 2 ROS packages, the **tello_driver** and the **tello_msgs**.
-The **tello_driver** is the core, where the **tello_msgs** only contains custom messages specifig to Tello, such as the flight data.
+The **tello_driver** is the core, where the **tello_msgs** only contains custom messages specific to Tello, such as the flight data.
 
 ---
 
@@ -57,9 +58,9 @@ The **tello_driver** is the core, where the **tello_msgs** only contains custom 
 
 **Note: you should place this repository inside the `catkin_ws/src` folder!**
 
-1. go to your _catkin_ws_ and do `catkin_make` and source the `catkin_ws/devel` setup file(only needs to be done once)
-2. To launch the tello driver and making it to connect to the tello's wifi automatically run this command: `roslaunch tello_driver tello_driver_ros.launch tello_ssid:=<the ssid of tello's wifi>``
-3. To launch the tello driver and manually connect to the tello's wifi run this command: `roslaunch tello_driver tello_driver_ros.launch connect_to_tello_wifi_auto:=false`
+1. go to your _catkin_ws_ and do `catkin_make` and source the `catkin_ws/devel` setup file (only needs to be done once)
+2. To launch the tello driver and make it connect to the tello's wifi automatically, run this command: `roslaunch tello_driver tello_driver_ros.launch tello_ssid:=<the ssid of tello's wifi>`
+3. To launch the tello driver and manually connect to the tello's wifi, run this command: `roslaunch tello_driver tello_driver_ros.launch connect_to_tello_wifi_auto:=false`
 
 ## Dependencies
 
