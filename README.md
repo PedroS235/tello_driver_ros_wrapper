@@ -47,7 +47,7 @@ The **tello_driver** is the core, where the **tello_msgs** only contains custom 
   - **Default:** `world`
 - `connect_to_tello_wifi_auto`
   - **Default:** `true`
-- `tello_ssid` (default: _world_)
+- `tello_ssid`
   - Only required if _connect_to_tello_wifi_auto_ is set to true
 - `tello_password`
   - **Default:** None
