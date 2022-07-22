@@ -131,27 +131,6 @@ class TelloDriver(object):
 
     def read_params(self):
         print("[info] - Reading parameters")
-        self.tello_takeoff_topic_name = rospy.get_param(
-            "/tello_driver_node/tello_takeoff_topic_name",
-            default=self.tello_takeoff_topic_name,
-        )
-        self.tello_land_topic_name = rospy.get_param(
-            "/tello_driver_node/tello_land_topic_name",
-            default=self.tello_land_topic_name,
-        )
-        self.tello_flip_control_topic_name = rospy.get_param(
-            "/tello_driver_node/tello_flip_control_topic_name",
-            default=self.tello_flight_data_topic_name,
-        )
-        self.tello_image_topic_name = rospy.get_param(
-            "/tello_driver_node/tello_image_topic_name",
-            default=self.tello_image_topic_name,
-        )
-        self.tello_flight_data_topic_name = rospy.get_param(
-            "/tello_driver_node/tello_flight_data_topic_name",
-            default=self.tello_flight_data_topic_name,
-        )
-
         self.tello_ssid = rospy.get_param(
             "/tello_driver_node/tello_ssid", default=self.tello_ssid
         )
@@ -163,6 +142,7 @@ class TelloDriver(object):
             "/tello_driver_node/connect_to_tello_wifi_auto",
             default=self._connect_to_tello_wifi_auto,
         )
+        print("[info] - Finished reading parameters")
 
     def set_cmd_vel(self, lin_cmd_vel, ang_cmd_vel):
         # TODO: in case a collision is detected only allow to move away from the obstacle
@@ -317,6 +297,7 @@ class TelloDriver(object):
 
     def _connect_to_tello_network(self):
         print("[info] [Tello_driver] - Connecting to drone")
+        print("asdfasdfasfasdf", self._connect_to_tello_wifi_auto)
         if self._connect_to_tello_wifi_auto:
             if not cwd.connect_device(self.tello_ssid, self.tello_pw, verbose=False):
                 print("[error] [Tello_driver] - Connection to drone unsuccessful!")

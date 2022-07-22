@@ -24,24 +24,19 @@ class TelloDriverRos:
 
     # - Subscribers
     robot_collision_sub = None
-    flag_sub_tello_vel_cmd_unstamped = True
     tello_vel_cmd_unstamped_sub = None
     tello_vel_cmd_stamped_sub = None
     robot_collision_sub = None
 
     # - Topics
-    tello_vel_cmd_unstamped_topic_name = "/tello/cmd_vel_unstamped"
     tello_vel_cmd_stamped_topic_name = "/tello/cmd_vel_stamped"
     tello_collision_topic_name = "/tello/is_colliding"
     tello_pose_topic_name = "/tello/pose"
 
     # - TF2
-    tello_frame = "tello_base_link"
+    tello_frame = "robot_base_link"
     world_frame = "world"
     tf2_broadcaster = None
-
-    # - Flags
-    flag_sub_tello_vel_cmd_unstamped = True
 
     # - Timers
     pub_step_timer = None
@@ -67,18 +62,6 @@ class TelloDriverRos:
         )
 
     def init_sub(self):
-        if self.flag_sub_tello_vel_cmd_unstamped:
-            print(
-                "[info] [Tello_driver_ros] - Command velocity unstamped topic enabled"
-            )
-            print(
-                f"[info] [Tello_driver_ros]- Subscribing to <{self.tello_vel_cmd_unstamped_topic_name}> topic"
-            )
-            self.tello_vel_cmd_unstamped_sub = rospy.Subscriber(
-                self.tello_vel_cmd_unstamped_topic_name,
-                Twist,
-                self.tello_vel_cmd_unstamped_callback,
-            )
         print(
             f"[info] [Tello_driver_ros]- Subscribing to <{self.tello_vel_cmd_stamped_topic_name}> topic"
         )
@@ -102,19 +85,6 @@ class TelloDriverRos:
 
     def read_params(self):
         print("[info] [Tello_driver_ros] - Reading parameters")
-        self.tello_vel_cmd_unstamped_topic_name = rospy.get_param(
-            "/tello_driver_node/tello_vel_cmd_unstamped_topic_name",
-            default=self.tello_vel_cmd_unstamped_topic_name,
-        )
-        self.tello_vel_cmd_stamped_topic_name = rospy.get_param(
-            "/tello_driver_node/tello_vel_cmd_stamped_topic_name",
-            default=self.tello_vel_cmd_stamped_topic_name,
-        )
-
-        self.flag_sub_tello_vel_cmd_unstamped = rospy.get_param(
-            "/tello_driver_node/flag_sub_tello_vel_cmd_unstamped",
-            default=self.flag_sub_tello_vel_cmd_unstamped,
-        )
 
         self.tello_frame = rospy.get_param(
             "/tello_driver_node/tello_frame_name", self.tello_frame
@@ -122,27 +92,12 @@ class TelloDriverRos:
         self.world_frame = rospy.get_param(
             "/tello_driver_node/tello_world_frame_name", self.world_frame
         )
-        self.tello_collision_topic_name = rospy.get_param(
-            "/tello_driver_node/tello_collision_topic_name",
-            self.tello_collision_topic_name,
-        )
+
+        print("[info] [Tello_driver_ros] - Finished reading parameters")
 
     # +--------------------+
     # | Start of Callbacks |
     # +--------------------+
-
-    def tello_vel_cmd_unstamped_callback(self, twist_msg):
-        lin_vel_cmd = np.zeros((3,), dtype=float)
-        lin_vel_cmd[0] = twist_msg.linear.x
-        lin_vel_cmd[1] = twist_msg.linear.y
-        lin_vel_cmd[2] = twist_msg.linear.z
-
-        alg_vel_cmd = np.zeros((3,), dtype=float)
-        alg_vel_cmd[0] = twist_msg.angular.x
-        alg_vel_cmd[1] = twist_msg.angular.y
-        alg_vel_cmd[2] = twist_msg.angular.z
-
-        self.driver.set_cmd_vel(lin_vel_cmd, alg_vel_cmd)
 
     def tello_vel_cmd_stamped_callback(self, twist_msg):
         lin_vel_cmd = np.zeros((3,), dtype=float)
@@ -162,16 +117,13 @@ class TelloDriverRos:
 
     def tello_collision_callback(self, msg):
         self.driver.set_flag_collision_detected(msg.data)
-        self.driver.set_flag_collision_detected(
-            False
-        )  # fix while not having the object detection working
 
     # +------------------+
     # | End of Callbacks |
     # +------------------+
 
     def tello_pose_msg_creation(self):
-        curr_time_stamp = rospy.Time()
+        curr_time_stamp = rospy.Time().now()
         try:
             pose = self.buffer.lookup_transform(
                 self.world_frame, self.robot_frame, curr_time_stamp
@@ -200,9 +152,3 @@ class TelloDriverRos:
     def run(self):
         rospy.spin()
         self.tello.quit()
-
-
-if __name__ == "__main__":
-    tello_driver = TelloDriverRos()
-    tello_driver.begin()
-    tello_driver.run()

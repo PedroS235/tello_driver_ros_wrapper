@@ -1,11 +1,10 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>tello_driver</name>
-  <version>0.0.0</version>
-  <description>Simple ros wrapper to control a Tello drone</description>
+  <version>0.0.1</version>
+  <description>Simple ros wrapper to control a Tello drone via command velocity commands</description>
 
   <maintainer email="pmbs.12@hotmail.com">pedros235</maintainer>
-
 
   <license>MIT</license>
 

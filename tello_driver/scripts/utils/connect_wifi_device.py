@@ -3,7 +3,7 @@ import subprocess
 import time
 
 CONNECTION_ATTEMPTS = 0
-MAX_NUMBER_OF_ATTEMPTS = 10
+MAX_NUMBER_OF_ATTEMPTS = 15
 
 
 def connect_device(ssid, password=None, verbose=True):
