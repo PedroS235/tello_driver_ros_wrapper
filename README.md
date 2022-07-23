@@ -13,11 +13,11 @@ The **tello_driver** is the core, where the **tello_msgs** only contains custom 
 
 ## The available ROS topics
 
-- `tello_takeoff_topic_name` (default: _tello/takeoff_)
+- `tello_takeoff_topic_name`
   - **Default:** `/tello/takeoff`
   - **Purpose:** Trigger the drone to takeoff.
   - **Use:** Send an empty msg.
-- `tello_land_topic_name` (default: _tello/land_)
+- `tello_land_topic_name`
   - **Default:** `/tello/lang`
   - **Purpose:** Trigger the drone to land.
   - **Use:** Send an empty msg.
