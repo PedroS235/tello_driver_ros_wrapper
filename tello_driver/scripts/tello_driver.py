@@ -147,9 +147,9 @@ class TelloDriver(object):
     def set_cmd_vel(self, lin_cmd_vel, ang_cmd_vel):
         if self._collision_detected_flag:
             self._tello.set_pitch(lin_cmd_vel[0])  # linear X value
-            self._tello.set_roll(lin_cmd_vel[1])  # linear Y value
+            self._tello.set_roll(-lin_cmd_vel[1])  # linear Y value
             self._tello.set_throttle(lin_cmd_vel[2])  # linear Z value
-            self._tello.set_yaw(ang_cmd_vel[2])  # angular Z value
+            self._tello.set_yaw(-ang_cmd_vel[2])  # angular Z value
 
     def set__collision_detected_flag(self, flag):
         self._collision_detected_flag = flag
