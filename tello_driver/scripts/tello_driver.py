@@ -190,29 +190,63 @@ class TelloDriver(object):
         flight_data = FlightData()
 
         # - Battery data
-        flight_data.battery_percentage = data.battery_percentage
         flight_data.battery_low = data.battery_low
-        flight_data.battery_time_left = data.drone_battery_left
+        flight_data.battery_lower = data.battery_lower
+        flight_data.battery_percentage = data.battery_percentage
+        flight_data.drone_battery_left = data.drone_battery_left
+        flight_data.drone_fly_time_left = data.drone_fly_time_left
 
-        # - IMU Data
-        flight_data.height = data.height
-        flight_data.north_speed = data.north_speed
-        flight_data.east_speed = data.east_speed
-        flight_data.ground_speed = data.ground_speed
+        # =========================================================================
 
-        # - Drone States
+        # - States
+        flight_data.battery_state = data.battery_state
         flight_data.camera_state = data.camera_state
+        flight_data.electrical_machinery_state = data.electrical_machinery_state
+        flight_data.down_visual_state = data.down_visual_state
+        flight_data.gravity_state = data.gravity_state
         flight_data.imu_calibration_state = data.imu_calibration_state
         flight_data.imu_state = data.imu_state
-        flight_data.battery_state = data.battery_state
         flight_data.power_state = data.power_state
+        flight_data.pressure_state = data.pressure_state
+        flight_data.wind_state = data.wind_state
 
-        # - Drone Stats
+        # =========================================================================
+
+        # - Stats
+        flight_data.drone_hover = data.drone_hover
+        flight_data.em_open = data.em_open
+        flight_data.em_sky = data.em_sky
+        flight_data.em_ground = data.em_ground
+        flight_data.factory_mode = data.factory_mode
         flight_data.fly_mode = data.fly_mode
+        flight_data.fly_time = data.fly_time
+        flight_data.front_in = data.front_in
+        flight_data.front_lsc = data.front_lsc
+        flight_data.front_out = data.front_out
 
-        # - WiFi Data
-        flight_data.wifi_strength = data.wifi_strength
+        # =========================================================================
+
+        # - Sensors
+        flight_data.fly_speed = data.fly_speed
+        flight_data.east_speed = data.east_speed
+        flight_data.ground_speed = data.ground_speed
+        flight_data.height = data.height
+        flight_data.light_strength = data.light_strength
+        flight_data.north_speed = data.north_speed
+        flight_data.temperature_height = data.temperature_height
+
+        # =========================================================================
+
+        # - Other
+        flight_data.outage_recording = data.outage_recording
+        flight_data.smart_video_exit_mode = data.smart_video_exit_mode
+        flight_data.throw_fly_timer = data.throw_fly_timer
+
+        # =========================================================================
+
+        # - WiFi
         flight_data.wifi_disturb = data.wifi_disturb
+        flight_data.wifi_strength = data.wifi_strength
 
         self._current_battery_percentage = flight_data.battery_percentage
 
