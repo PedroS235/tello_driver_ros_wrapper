@@ -36,6 +36,9 @@ The **tello_driver** is the core, where the **tello_msgs** only contains custom 
 - `tello_flip_control_topic_name`
   - **Default:** `/tello/flip_control`
   - **Purpose:** Triggers the drone to perform a flip. Refer to `tello_msgs/msg/FlipControl` to see the type of the message to send.
+- `tello_cmd_vel_topic_name`
+  - **Default:** `/tello/cmd_vel`
+  - **Purpose:** Publish the drone velocity.
 
 ---
 
