@@ -2,12 +2,11 @@
 
 import rospy
 import numpy as np
-import tf2_ros
 from tello_driver import TelloDriver
 
 
 # - ROS messages imports
-from geometry_msgs.msg import Twist, TwistStamped, PoseStamped
+from geometry_msgs.msg import TwistStamped, PoseStamped
 from std_msgs.msg import Bool, Header
 
 
@@ -15,12 +14,7 @@ class TelloDriverRos:
 
     # - Publishers
     tello_pose_pub = None
-
-    robot_vel_world_pub = None
-    robot_vel_robot_pub = None
-
-    robot_acc_world_pub = None
-    robot_acc_robot_pub = None
+    tello_vel_pub = None
 
     # - Subscribers
     robot_collision_sub = None
@@ -31,6 +25,7 @@ class TelloDriverRos:
     tello_vel_cmd_stamped_topic_name = "/tello/cmd_vel_stamped"
     tello_collision_topic_name = "/tello/is_colliding"
     tello_pose_topic_name = "/tello/pose"
+    tello_cmd_vel_topic_name = "/tello/cmd_vel"
 
     # - TF2
     tello_frame = "robot_base_link"
@@ -58,6 +53,9 @@ class TelloDriverRos:
         )
         self.tello_pose_pub = rospy.Publisher(
             self.tello_pose_topic_name, PoseStamped, queue_size=1
+        )
+        self.tello_vel_pub = rospy.Publisher(
+            self.tello_cmd_vel_topic_name, TwistStamped, queue_size=1
         )
 
     def init_sub(self):
@@ -113,6 +111,7 @@ class TelloDriverRos:
 
     def pub_step_timer_callback(self, timer_msg):
         self.tello_pose_msg_creation()
+        self.publish_tello_cmd_vel()
 
     def tello_collision_callback(self, msg):
         self.driver.set_flag_collision_detected(msg.data)
@@ -120,6 +119,21 @@ class TelloDriverRos:
     # +------------------+
     # | End of Callbacks |
     # +------------------+
+
+    def publish_tello_cmd_vel(self):
+        twist_msg = TwistStamped
+        twist_msg.header = rospy.Time().now()
+        tello_vel = self.driver.get_tello_vel()
+
+        twist_msg.twist.linear.x = tello_vel["lin"]["x"]
+        twist_msg.twist.linear.y = tello_vel["lin"]["y"]
+        twist_msg.twist.linear.z = tello_vel["lin"]["z"]
+
+        twist_msg.twist.angular.x = tello_vel["ang"]["x"]
+        twist_msg.twist.angular.y = tello_vel["ang"]["y"]
+        twist_msg.twist.angular.z = tello_vel["ang"]["z"]
+
+        self.tello_vel_pub.publish(twist_msg)
 
     def tello_pose_msg_creation(self):
         curr_time_stamp = rospy.Time().now()

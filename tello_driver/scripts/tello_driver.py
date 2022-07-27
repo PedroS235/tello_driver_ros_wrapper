@@ -39,7 +39,7 @@ class TelloDriver(object):
     tello_flip_control_topic_name = "/tello/flip_control"
     tello_land_topic_name = "/tello/land"
     tello_image_topic_name = "/tello/camera/image_raw"
-    tello_flight_data_topic_name = "/tello_flight_data"
+    tello_flight_data_topic_name = "/tello/flight_data"
 
     # - Timers
     _battery_percentage_display_timer = None
@@ -55,6 +55,9 @@ class TelloDriver(object):
         "lin": {"x": True, "y": True, "z": True},
         "ang": {"z": True},
     }
+    drone_x_vel = 0
+    drone_y_vel = 0
+    drone_z_vel = 0
 
     curr_time = time.time()
 
@@ -145,16 +148,30 @@ class TelloDriver(object):
         print("[info] - Finished reading parameters")
 
     def set_cmd_vel(self, lin_cmd_vel, ang_cmd_vel):
-        if self._collision_detected_flag:
-            self._tello.set_pitch(lin_cmd_vel[0])  # linear X value
-            self._tello.set_roll(-lin_cmd_vel[1])  # linear Y value
-            self._tello.set_throttle(lin_cmd_vel[2])  # linear Z value
-            self._tello.set_yaw(-ang_cmd_vel[2])  # angular Z value
+        # if self._collision_detected_flag:
+        self._tello.set_pitch(lin_cmd_vel[0])  # linear X value
+        self._tello.set_roll(-lin_cmd_vel[1])  # linear Y value
+        self._tello.set_throttle(lin_cmd_vel[2])  # linear Z value
+        self._tello.set_yaw(-ang_cmd_vel[2])  # angular Z value
 
-    def set__collision_detected_flag(self, flag):
+    def set_collision_detected_flag(self, flag):
         self._collision_detected_flag = flag
         if self._collision_detected_flag:
             print("[info] [Tello_driver] - Coollision detected")
+
+    def get_tello_vel(self):
+        return {
+            "lin": {
+                "x": self.drone_x_vel,
+                "y": self.drone_y_vel,
+                "z": self.drone_z_vel,
+            },
+            "ang": {
+                "x": 0,
+                "y": 0,
+                "z": 0,
+            },
+        }
 
     # +--------------------+
     # | Start of Callbacks |
@@ -194,7 +211,7 @@ class TelloDriver(object):
         flight_data.battery_lower = data.battery_lower
         flight_data.battery_percentage = data.battery_percentage
         flight_data.drone_battery_left = data.drone_battery_left
-        flight_data.drone_fly_time_left = data.drone_fly_time_left
+        # flight_data.drone_fly_time_left = data.drone_fly_time_left
 
         # =========================================================================
 
@@ -219,7 +236,7 @@ class TelloDriver(object):
         flight_data.em_ground = data.em_ground
         flight_data.factory_mode = data.factory_mode
         flight_data.fly_mode = data.fly_mode
-        flight_data.fly_time = data.fly_time
+        # flight_data.fly_time = data.fly_time
         flight_data.front_in = data.front_in
         flight_data.front_lsc = data.front_lsc
         flight_data.front_out = data.front_out
@@ -240,7 +257,7 @@ class TelloDriver(object):
         # - Other
         flight_data.outage_recording = data.outage_recording
         flight_data.smart_video_exit_mode = data.smart_video_exit_mode
-        flight_data.throw_fly_timer = data.throw_fly_timer
+        # flight_data.throw_fly_timer = data.throw_fly_timer
 
         # =========================================================================
 
@@ -249,6 +266,9 @@ class TelloDriver(object):
         flight_data.wifi_strength = data.wifi_strength
 
         self._current_battery_percentage = flight_data.battery_percentage
+        self.drone_x_vel = flight_data.north_speed
+        self.drone_y_vel = flight_data.east_speed
+        self.drone_z_vel = flight_data.ground_speed
 
         # - Publish Flight data
         self._flight_data_pub.publish(flight_data)
