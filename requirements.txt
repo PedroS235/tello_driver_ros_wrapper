@@ -1,0 +1,14 @@
+ament_copyright==0.12.4
+ament_flake8==0.12.4
+ament_pep257==0.12.4
+av==9.2.0
+cv_bridge==3.0.3
+geometry_msgs==4.2.2
+numpy==1.21.5
+opencv_python==4.6.0.66
+pytest==6.2.5
+rclpy==3.3.4
+setuptools==59.6.0
+std_msgs==4.2.2
+tello_msg==0.0.0
+tellopy==0.6.0
