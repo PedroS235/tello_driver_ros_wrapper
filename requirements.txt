@@ -1,3 +1,0 @@
-av==9.2.0
-cv_bridge==1.16.0
-tellopy==0.6.0
