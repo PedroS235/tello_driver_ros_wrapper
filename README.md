@@ -1,4 +1,4 @@
-# DISCLAIMER: This repo has not intention of begin upgraded. A new version of this repo is being developed for ROS2 support and can be found [here](https://github.com/PedroS235/tello_ros_wrapper)
+# DISCLAIMER: This repo has no intention of begin upgraded. A new version of this repo is being developed for ROS2 support and can be found [here](https://github.com/PedroS235/tello_ros_wrapper)
 # Introduction
 
 Tello **driver_ros_wrapper** is a simple ROS metapackage that allows to control DJI Tello drone via ROS topics.
